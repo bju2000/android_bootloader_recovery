@@ -49,7 +49,7 @@ std::string MROMInstaller::open(const std::string& file)
 	MemMapping map;
 	if (sysMapFile(file.c_str(), &map) != 0) {
 		LOGERR("Failed to sysMapFile '%s'\n", file.c_str());
-		return false;
+		return 0;
 	}
 
 	if (mzOpenZipArchive(map.addr, map.length, &zip) != 0)
@@ -303,14 +303,14 @@ bool MROMInstaller::extractDir(const std::string& name, const std::string& dest)
 	MemMapping map;
 	if (sysMapFile(m_file.c_str(), &map) != 0) {
 		LOGERR("Failed to sysMapFile '%s'\n", m_file.c_str());
-		return false;
+		return 0;
 	}
 
 	if (mzOpenZipArchive(map.addr, map.length, &zip) != 0)
 	{
 		gui_print("Failed to open ZIP file %s\n", m_file.c_str());
 		sysReleaseMap(&map);
-		return false;
+		return 0;
 	}
 
 	// To create a consistent system image, never use the clock for timestamps.
@@ -323,7 +323,7 @@ bool MROMInstaller::extractDir(const std::string& name, const std::string& dest)
 	if(!success)
 	{
 		gui_print("Failed to extract dir %s from zip %s\n", name.c_str(), m_file.c_str());
-		return false;
+		return 0;
 	}
 	return true;
 }
@@ -334,14 +334,14 @@ bool MROMInstaller::extractFile(const std::string& name, const std::string& dest
 	MemMapping map;
 	if (sysMapFile(m_file.c_str(), &map) != 0) {
 		LOGERR("Failed to sysMapFile '%s'\n", m_file.c_str());
-		return false;
+		return 0;
 	}
 
 	if (mzOpenZipArchive(map.addr, map.length, &zip) != 0)
 	{
 		gui_print("Failed to open ZIP file %s\n", m_file.c_str());
 		sysReleaseMap(&map);
-		return false;
+		return 0;
 	}
 
 	bool res = false;
@@ -377,14 +377,14 @@ bool MROMInstaller::hasEntry(const std::string& name)
 	MemMapping map;
 	if (sysMapFile(m_file.c_str(), &map) != 0) {
 		LOGERR("Failed to sysMapFile '%s'\n", m_file.c_str());
-		return false;
+		return 0;
 	}
 
 	if (mzOpenZipArchive(map.addr, map.length, &zip) != 0)
 	{
 		gui_print("Failed to open ZIP file %s\n", m_file.c_str());
 		sysReleaseMap(&map);
-		return false;
+		return 0;
 	}
 
 	// Check also for entry with / - according to minzip, folders
@@ -409,7 +409,7 @@ bool MROMInstaller::runScripts(const std::string& dir, const std::string& base, 
 	}
 
 	if(!extractDir(dir, "/tmp/script/"))
-		return false;
+		return 0;
 
 	if(system("ls /tmp/script/*.sh") == 0)
 	{
@@ -423,7 +423,7 @@ bool MROMInstaller::runScripts(const std::string& dir, const std::string& base, 
 		{
 			system("rm -r /tmp/script/");
 			gui_print("One of the ROM scripts returned error status!");
-			return false;
+			return 0;
 		}
 	}
 	else
@@ -478,7 +478,7 @@ bool MROMInstaller::extractBase(const std::string& base, const std::string& name
 				break;
 
 			if(!extractTarball(base, name, cmd))
-				return false;
+				return 0;
 		}
 	}
 
@@ -491,7 +491,7 @@ bool MROMInstaller::extractTarball(const std::string& base, const std::string& n
 
 	system("rm /tmp/tarballs/rom.tar.gz");
 	if(!extractFile(tarball, "/tmp/tarballs/rom.tar.gz"))
-		return false;
+		return 0;
 
 	bool res = true;
 
@@ -514,7 +514,7 @@ bool MROMInstaller::checkFreeSpace(const std::string& base, bool images)
 	if(res < 0)
 	{
 		gui_print("Check for free space failed: %s %d %d %s!\n", base.c_str(), res, errno, strerror(errno));
-		return false;
+		return 0;
 	}
 
 	int free = (s.f_bavail * (s.f_bsize/1024) ) / 1024;

@@ -393,6 +393,10 @@ LOCAL_ADDITIONAL_DEPENDENCIES := \
     permissive.sh \
     simg2img_twrp
 
+ifneq ($(TW_USE_TOOLBOX),true)
+    LOCAL_ADDITIONAL_DEPENDENCIES += busyboxtwrp
+endif
+
 #MultiROM
 ifeq ($(TARGET_RECOVERY_IS_MULTIROM), true)
     #LOCAL_C_INCLUDES += $(LOCAL_PATH)/multirom
@@ -516,7 +520,7 @@ include $(BUILD_EXECUTABLE)
 ifneq ($(TW_USE_TOOLBOX), true)
 include $(CLEAR_VARS)
 # Create busybox symlinks... gzip and gunzip are excluded because those need to link to pigz instead
-BUSYBOX_LINKS := $(shell cat external/busybox/busybox-full.links)
+BUSYBOX_LINKS := $(shell cat $(LOCAL_PATH)/busybox/busybox-full.links)
 exclude := tune2fs mke2fs mkdosfs mkfs.vfat gzip gunzip
 
 # Having /sbin/modprobe present on 32 bit devices with can cause a massive
@@ -664,6 +668,7 @@ include $(commands_recovery_local_path)/injecttwrp/Android.mk \
     $(commands_recovery_local_path)/dosfstools/Android.mk \
     $(commands_recovery_local_path)/etc/Android.mk \
     $(commands_recovery_local_path)/toybox/Android.mk \
+    $(commands_recovery_local_path)/busybox/Android.mk \
     $(commands_recovery_local_path)/simg2img/Android.mk \
     $(commands_recovery_local_path)/libpixelflinger/Android.mk
 
